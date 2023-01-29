@@ -193,6 +193,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonTakePhotoPortrait.setOnClickListener {
 
+            val photoNumberPosition = spinnerPhotoNumber.selectedItemPosition
+            val pN = arrayOf(2, 3, 4, 8)
+            photoNumber = pN[photoNumberPosition]
+            secondsNumber = editTextSeconds.text.toString().toInt()
+            secondsNumberEdit = secondsNumber*1000
             for (i in 1..photoNumber) {
                 Thread.sleep(secondsNumberEdit.toLong())
                 takePhoto()
