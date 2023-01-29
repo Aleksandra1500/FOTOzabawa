@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">FOTOzabawa</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="options_string">Options</string>
+    <string name="take_photo_string">Start</string>
+    <string name="odstęp_string">Odstęp między zdjęciami:</string>
+    <string name="liczba_zdj_string">Liczba zdjęć w serii:</string>
+    <string name="motyw_string">Motyw:</string>
+</resources>

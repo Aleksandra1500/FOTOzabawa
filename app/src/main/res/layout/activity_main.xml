@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#E4E3E3"
+    tools:context=".MainActivity"
+    android:backgroundTint="@color/black">
+
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
+        android:layout_width="410dp"
+        android:layout_height="410dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center">
+    </androidx.camera.view.PreviewView>
+
+    <Button
+        android:id="@+id/buttonTakePhotoPortrait"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/fine_blue"
+        android:text="@string/take_photo_string"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/viewFinder"
+        android:textSize="17sp"/>
+
+    <Button
+        android:id="@+id/buttonTakePhotoLandscape"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/fine_blue"
+        android:text="@string/take_photo_string"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- Base CardView -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/base_cardview"
+        style="@style/Base.CardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@android:color/transparent">
+
+        <!-- This is a ConstraintLayout for the entire CardView including the expandable portion -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/base_cardview"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@color/fine_blue2">
+
+            <!-- This is a ConstraintLayout for the fixed portion of the CardView. The elements that
+            lie within the fixed portion of the CardView can be constrained to this layout -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/fixed_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0"
+                android:background="@color/fine_blue">
+
+                <!-- This is ImageButton for the expansion icon -->
+                <ImageButton
+                    android:id="@+id/arrow_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:backgroundTint="@color/fine_blue"
+                    android:minHeight="40dp"
+                    android:src="@drawable/ic_baseline_expand_more_20"
+                    app:layout_constraintBottom_toBottomOf="@id/fixed_layout"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- The following is the expandable portion whose visibility is initially set to 'gone'
+            The parent LinearLayout contains 3 child LinearLayouts that hold a subject name and an icon each -->
+            <LinearLayout
+                android:id="@+id/hidden_view"
+                android:layout_width="400dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fixed_layout"
+                android:background="@color/fine_blue">
+
+                <!-- Child LinearLayout 1 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/liczba_zdj_string"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <Spinner
+                        android:id="@+id/photoNumberSpinner"
+                        android:layout_width="50dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginEnd="110dp"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:entries="@array/spinnerItems"
+                        android:inputType="number"
+                        android:spinnerMode="dropdown"
+                        android:textAlignment="center"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+
+                <!-- Child LinearLayout 2 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="20dp"
+                        android:layout_marginTop="20dp"
+                        android:text="@string/odstęp_string"
+                        android:textColor="@color/white"
+                        android:textSize="20sp" />
+
+                    <EditText
+                        android:id="@+id/editSecondsNumber"
+                        android:layout_width="50dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:inputType="number"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginEnd="90dp"
+                        android:layout_marginStart="10dp"
+                        android:text="3"
+                        android:textSize="18sp"
+                        android:textColor="@color/black"
+                        android:textAlignment="center"/>
+
+                </LinearLayout>
+
+                <!-- Child LinearLayout 3 -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="350dp">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/motyw_string"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView1"
+                        android:layout_width="90dp"
+                        android:layout_height="160dp"
+                        android:layout_marginStart="20dp"
+                        android:padding="2dp"
+                        app:layout_constraintBottom_toTopOf="@+id/imageViewRandom"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic"
+                        android:background="@color/fine_blue"/>
+
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="90dp"
+                        android:layout_height="160dp"
+                        android:padding="2dp"
+                        app:layout_constraintBottom_toTopOf="@+id/imageViewRandom"
+                        app:layout_constraintStart_toEndOf="@+id/imageView1"
+                        app:layout_constraintTop_toBottomOf="@+id/textView"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic"
+                        android:background="@color/fine_blue"/>
+
+                    <ImageView
+                        android:id="@+id/imageView3"
+                        android:layout_width="90dp"
+                        android:layout_height="160dp"
+                        android:padding="2dp"
+                        app:layout_constraintBottom_toTopOf="@+id/imageViewRandom"
+                        app:layout_constraintStart_toEndOf="@+id/imageView2"
+                        app:layout_constraintTop_toBottomOf="@+id/textView"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic"
+                        android:background="@color/fine_blue"/>
+
+                    <ImageView
+                        android:id="@+id/imageView4"
+                        android:layout_width="90dp"
+                        android:layout_height="160dp"
+                        android:padding="2dp"
+                        app:layout_constraintBottom_toTopOf="@+id/imageViewRandom"
+                        app:layout_constraintStart_toEndOf="@+id/imageView3"
+                        app:layout_constraintTop_toBottomOf="@+id/textView"
+                        tools:srcCompat="@tools:sample/backgrounds/scenic"
+                        android:background="@color/fine_blue"/>
+
+                    <ImageView
+                        android:id="@+id/imageViewRandom"
+                        android:layout_width="120dp"
+                        android:layout_height="50dp"
+                        android:layout_marginBottom="24dp"
+                        android:padding="2dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:srcCompat="@drawable/random"
+                        android:background="@color/fine_blue"/>
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
