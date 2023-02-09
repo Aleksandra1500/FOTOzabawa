@@ -11,9 +11,7 @@ import android.text.Editable
 import android.transition.AutoTransition
 import android.transition.TransitionManager
 import android.util.Log
-import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup.LayoutParams
 import android.view.WindowManager
 import android.widget.*
 import androidx.annotation.RequiresApi
@@ -24,11 +22,10 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.cardview.widget.CardView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.marginStart
 import com.example.fotozabawa.Constants.TAG
+import com.example.fotozabawa.api.RestApiService
 import com.example.fotozabawa.databinding.ActivityMainBinding
 import com.example.fotozabawa.model.database.SettingsDatabase
 import com.example.fotozabawa.model.entity.Settings
@@ -50,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var cardView: CardView
 
     private lateinit var binding: ActivityMainBinding
-    private var imageCapture:ImageCapture? = null
+    private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
 
     private lateinit var cameraExecutor: ExecutorService
@@ -70,8 +67,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         settingsDatabase = SettingsDatabase.getDatabase(this)
-        window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN)
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_FULLSCREEN
+        )
         setContentView(binding.root)
         supportActionBar?.hide()
 
@@ -83,14 +82,11 @@ class MainActivity : AppCompatActivity() {
 
         val myCardView = findViewById<CardView>(R.id.base_cardview)
 
-        if(orintationMode == 2)
-        {
+        if (orintationMode == 2) {
             myCardView.visibility = View.GONE
             binding.buttonTakePhotoPortrait.visibility = View.GONE
             binding.buttonTakePhotoLandscape.visibility = View.VISIBLE
-        }
-        else
-        {
+        } else {
             myCardView.visibility = View.VISIBLE
             binding.buttonTakePhotoPortrait.visibility = View.VISIBLE
             binding.buttonTakePhotoLandscape.visibility = View.GONE
@@ -110,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         val img4 = findViewById<ImageView>(R.id.imageView4)
         val random = findViewById<ImageView>(R.id.imageViewRandom)
 
-        img1.setOnClickListener{
+        img1.setOnClickListener {
             themeNumber = 1
             img1.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
@@ -119,7 +115,7 @@ class MainActivity : AppCompatActivity() {
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
         }
 
-        img2.setOnClickListener{
+        img2.setOnClickListener {
             themeNumber = 2
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
@@ -128,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
         }
 
-        img3.setOnClickListener{
+        img3.setOnClickListener {
             themeNumber = 3
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
@@ -137,7 +133,7 @@ class MainActivity : AppCompatActivity() {
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
         }
 
-        img4.setOnClickListener{
+        img4.setOnClickListener {
             themeNumber = 4
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
@@ -146,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
         }
 
-        random.setOnClickListener{
+        random.setOnClickListener {
             themeNumber = 5
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
@@ -167,7 +163,11 @@ class MainActivity : AppCompatActivity() {
                 hiddenView.visibility = View.GONE
                 arrow.setImageResource(R.drawable.ic_baseline_expand_more_20)
 
-                sendToDatabase(editTextSeconds.text.toString().toInt(), spinnerPhotoNumber.selectedItemPosition, themeNumber)
+                sendToDatabase(
+                    editTextSeconds.text.toString().toInt(),
+                    spinnerPhotoNumber.selectedItemPosition,
+                    themeNumber
+                )
 
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -181,9 +181,9 @@ class MainActivity : AppCompatActivity() {
         outputDirectory = getOutputDirectory()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
-        if (allPermissionGranted()){
+        if (allPermissionGranted()) {
             startCamera()
-        }else{
+        } else {
             ActivityCompat.requestPermissions(
                 this,
                 Constants.REQUIRED_PERMISSIONS,
@@ -197,11 +197,12 @@ class MainActivity : AppCompatActivity() {
             val pN = arrayOf(2, 3, 4, 8)
             photoNumber = pN[photoNumberPosition]
             secondsNumber = editTextSeconds.text.toString().toInt()
-            secondsNumberEdit = secondsNumber*1000
+            secondsNumberEdit = secondsNumber * 1000
             for (i in 1..photoNumber) {
                 Thread.sleep(secondsNumberEdit.toLong())
                 takePhoto()
             }
+            makePdf()
         }
 
         binding.buttonTakePhotoLandscape.setOnClickListener {
@@ -210,18 +211,19 @@ class MainActivity : AppCompatActivity() {
                 Thread.sleep(secondsNumberEdit.toLong())
                 takePhoto()
             }
+            makePdf()
         }
 
         // Load from database
-        GlobalScope.launch(Dispatchers.IO){
-            val sec = async{ settingsDatabase.settingsDAO().getSeconds() }
+        GlobalScope.launch(Dispatchers.IO) {
+            val sec = async { settingsDatabase.settingsDAO().getSeconds() }
             val pNumber = async { settingsDatabase.settingsDAO().getPhotoNumber() }
             val theme = async { settingsDatabase.settingsDAO().getTheme() }
 
             val editable = Editable.Factory.getInstance().newEditable(sec.await().toString())
             editTextSeconds.text = editable
             secondsNumber = sec.await().toString().toInt()
-            secondsNumberEdit = secondsNumber*1000
+            secondsNumberEdit = secondsNumber * 1000
             spinnerPhotoNumber.setSelection(pNumber.await())
             val pN = arrayOf(2, 3, 4, 8)
             photoNumber = pN[pNumber.await()]
@@ -247,39 +249,31 @@ class MainActivity : AppCompatActivity() {
         val img4 = findViewById<ImageView>(R.id.imageView4)
         val random = findViewById<ImageView>(R.id.imageViewRandom)
 
-        if(number == 1){
+        if (number == 1) {
             img1.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img3.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img4.setBackgroundColor(Color.parseColor("#AF3986AC"))
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
-        }
-        else if(number == 2)
-        {
+        } else if (number == 2) {
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
             img3.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img4.setBackgroundColor(Color.parseColor("#AF3986AC"))
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
-        }
-        else if(number == 3)
-        {
+        } else if (number == 3) {
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img3.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
             img4.setBackgroundColor(Color.parseColor("#AF3986AC"))
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
-        }
-        else if(number == 4)
-        {
+        } else if (number == 4) {
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img3.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img4.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
             random.setBackgroundColor(Color.parseColor("#AF3986AC"))
-        }
-        else if(number == 5)
-        {
+        } else if (number == 5) {
             img1.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img2.setBackgroundColor(Color.parseColor("#AF3986AC"))
             img3.setBackgroundColor(Color.parseColor("#AF3986AC"))
@@ -288,33 +282,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendToDatabase(secondsNumber: Int, photoNumber: Int, themeNumber: Int){
+    private fun sendToDatabase(secondsNumber: Int, photoNumber: Int, themeNumber: Int) {
         GlobalScope.launch(Dispatchers.IO) {
             settingsDatabase.settingsDAO().deleteAll()
-            val current = Settings(1,secondsNumber, photoNumber, themeNumber)
+            val current = Settings(1, secondsNumber, photoNumber, themeNumber)
             settingsDatabase.settingsDAO().insert(current)
         }
     }
 
-    private fun getOutputDirectory(): File{
-        val mediaDir = externalMediaDirs.firstOrNull()?.let {
-                mFile ->
-            File(mFile, resources.getString(R.string.app_name)).apply{
+    private fun getOutputDirectory(): File {
+        val mediaDir = externalMediaDirs.firstOrNull()?.let { mFile ->
+            File(mFile, resources.getString(R.string.app_name)).apply {
                 mkdirs()
             }
         }
 
-        return if(mediaDir != null && mediaDir.exists())
+        return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
     }
 
-    private fun takePhoto(){
+    private fun takePhoto() {
         val imageCapture = imageCapture ?: return
         val photoFile = File(
             outputDirectory,
-            SimpleDateFormat(Constants.FILE_NAME_FORMAT,
-                Locale.getDefault())
-                .format(System.currentTimeMillis()) + ".jpg")
+            SimpleDateFormat(
+                Constants.FILE_NAME_FORMAT,
+                Locale.getDefault()
+            )
+                .format(System.currentTimeMillis()) + ".jpg"
+        )
 
         val outputOption = ImageCapture
             .OutputFileOptions
@@ -324,7 +320,7 @@ class MainActivity : AppCompatActivity() {
         imageCapture.takePicture(
             outputOption,
             ContextCompat.getMainExecutor(this),
-            object  :ImageCapture.OnImageSavedCallback{
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
 
                     val savedUri = Uri.fromFile(photoFile)
@@ -335,11 +331,14 @@ class MainActivity : AppCompatActivity() {
                         "$msg $savedUri",
                         Toast.LENGTH_LONG
                     ).show()
+                    uploadPhoto(photoFile)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
-                    Log.e(TAG, "onError: ${exception.message}",
-                        exception)
+                    Log.e(
+                        TAG, "onError: ${exception.message}",
+                        exception
+                    )
                 }
 
             }
@@ -383,11 +382,12 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if(requestCode == Constants.REQUEST_CODE_PERMISSIONS){
-            if(allPermissionGranted()){
+        if (requestCode == Constants.REQUEST_CODE_PERMISSIONS) {
+            if (allPermissionGranted()) {
                 startCamera()
-            }else{
-                Toast.makeText(this,
+            } else {
+                Toast.makeText(
+                    this,
                     "Permission not granted by the user.",
                     Toast.LENGTH_SHORT
                 ).show()
@@ -397,7 +397,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun allPermissionGranted() =
-        Constants.REQUIRED_PERMISSIONS.all{
+        Constants.REQUIRED_PERMISSIONS.all {
             ContextCompat.checkSelfPermission(
                 baseContext, it
             ) == PackageManager.PERMISSION_GRANTED
@@ -408,7 +408,7 @@ class MainActivity : AppCompatActivity() {
         cameraExecutor.shutdown()
     }
 
-    private fun loadBanners(){
+    private fun loadBanners() {
 
         val img1 = findViewById<ImageView>(R.id.imageView1)
         img1.setImageResource(R.drawable.mountain)
@@ -422,5 +422,20 @@ class MainActivity : AppCompatActivity() {
         val img4 = findViewById<ImageView>(R.id.imageView4)
         img4.setImageResource(R.drawable.sea)
 
+    }
+
+    private fun uploadPhoto(file: File) {
+        val apiService = RestApiService()
+        apiService.uploadPhoto(file)
+        Toast.makeText(
+            this,
+            "uploaded",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun makePdf() {
+        val apiService = RestApiService()
+        apiService.printPdf(themeNumber, this)
     }
 }
