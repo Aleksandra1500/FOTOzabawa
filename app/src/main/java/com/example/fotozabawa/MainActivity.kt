@@ -326,11 +326,11 @@ class MainActivity : AppCompatActivity() {
                     val savedUri = Uri.fromFile(photoFile)
                     val msg = "Photo saved"
 
-                    Toast.makeText(
-                        this@MainActivity,
-                        "$msg $savedUri",
-                        Toast.LENGTH_LONG
-                    ).show()
+//                    Toast.makeText(
+//                        this@MainActivity,
+//                        "$msg $savedUri",
+//                        Toast.LENGTH_LONG
+//                    ).show()
                     uploadPhoto(photoFile)
                 }
 
@@ -427,15 +427,17 @@ class MainActivity : AppCompatActivity() {
     private fun uploadPhoto(file: File) {
         val apiService = RestApiService()
         apiService.uploadPhoto(file)
+
+        val name = file.name
         Toast.makeText(
             this,
-            "uploaded",
+            "Zdjęcie $name zostało pomyślnie wgrane",
             Toast.LENGTH_SHORT
         ).show()
     }
 
     private fun makePdf() {
         val apiService = RestApiService()
-        apiService.printPdf(themeNumber, this)
+        apiService.printPdf(themeNumber, this, supportFragmentManager)
     }
 }

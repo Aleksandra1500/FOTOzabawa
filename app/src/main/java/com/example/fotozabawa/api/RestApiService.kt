@@ -2,6 +2,8 @@ package com.example.fotozabawa.api
 
 import android.content.Context
 import android.widget.Toast
+import androidx.fragment.app.FragmentManager
+import com.example.fotozabawa.PdfDialogFragment
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -32,7 +34,7 @@ class RestApiService {
         )
     }
 
-    fun printPdf(theme: Int, context: Context){
+    fun printPdf(theme: Int, context: Context, supportFragmentManager: FragmentManager){
         val retroFit = ServiceBuilder.buildService(RestApi::class.java)
         retroFit.print(theme).enqueue(
             object: Callback<PrintResponse> {
@@ -43,11 +45,9 @@ class RestApiService {
                     call: Call<PrintResponse>,
                     response: Response<PrintResponse>
                 ) {
-                    Toast.makeText(
-                        context,
-                        response.body()?.url,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val newFragment = PdfDialogFragment()
+                    newFragment.url = response.body()?.url.toString()
+                    newFragment.show(supportFragmentManager, "pdf")
                 }
             }
         )

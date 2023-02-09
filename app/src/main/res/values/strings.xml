@@ -7,4 +7,8 @@
     <string name="odstęp_string">Odstęp między zdjęciami:</string>
     <string name="liczba_zdj_string">Liczba zdjęć w serii:</string>
     <string name="motyw_string">Motyw:</string>
+    <string name="dialog_pdf_title">Wygenerowano plik PDF</string>
+    <string name="dialog_pdf_message">Czy chcesz go wyświetlić?</string>
+    <string name="yes">Tak</string>
+    <string name="no">Nie</string>
 </resources>
