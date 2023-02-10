@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.media.*
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -60,6 +61,8 @@ class MainActivity : AppCompatActivity() {
     var themeNumber: Int = 0
 
     var orintationMode: Int = 0
+
+    lateinit var sounds: Sounds
 
     @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("ResourceAsColor")
@@ -191,6 +194,8 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        sounds = Sounds(this)
+
         binding.buttonTakePhotoPortrait.setOnClickListener {
 
             val photoNumberPosition = spinnerPhotoNumber.selectedItemPosition
@@ -198,20 +203,13 @@ class MainActivity : AppCompatActivity() {
             photoNumber = pN[photoNumberPosition]
             secondsNumber = editTextSeconds.text.toString().toInt()
             secondsNumberEdit = secondsNumber * 1000
-            for (i in 1..photoNumber) {
-                Thread.sleep(secondsNumberEdit.toLong())
-                takePhoto()
-            }
-            makePdf()
+
+            takePhotosWithTimer()
         }
 
         binding.buttonTakePhotoLandscape.setOnClickListener {
 
-            for (i in 1..photoNumber) {
-                Thread.sleep(secondsNumberEdit.toLong())
-                takePhoto()
-            }
-            makePdf()
+            takePhotosWithTimer()
         }
 
         // Load from database
@@ -299,6 +297,36 @@ class MainActivity : AppCompatActivity() {
 
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else filesDir
+    }
+
+    private fun takePhotosWithTimer() {
+        Timer().scheduleAtFixedRate(object : TimerTask() {
+            private var timeCount: Int = secondsNumber
+            private var photoCount: Int = 1
+            override fun run() {
+                if(timeCount == 0 && photoCount == photoNumber) {
+                    Log.i("timer", "timeCount == 0 && photoCount == photoNumber")
+                    sounds.shutter()
+                    takePhoto()
+                }
+                else if(timeCount == 0) {
+                    Log.i("timer", "timeCount == 0")
+                    sounds.shutter()
+                    takePhoto()
+                    photoCount += 1
+                    timeCount = secondsNumber + 1
+                }
+                else if(timeCount == -1) {
+                    makePdf()
+                    this.cancel()
+                }
+                else if(timeCount <= 3){
+                    Log.i("timer", "timeCount <= 3")
+                    sounds.bip()
+                }
+                timeCount -= 1
+            }
+        }, 0, 1000)
     }
 
     private fun takePhoto() {
@@ -426,14 +454,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun uploadPhoto(file: File) {
         val apiService = RestApiService()
-        apiService.uploadPhoto(file)
-
-        val name = file.name
-        Toast.makeText(
-            this,
-            "Zdjęcie $name zostało pomyślnie wgrane",
-            Toast.LENGTH_SHORT
-        ).show()
+        apiService.uploadPhoto(file, this.orintationMode == 1, this)
     }
 
     private fun makePdf() {

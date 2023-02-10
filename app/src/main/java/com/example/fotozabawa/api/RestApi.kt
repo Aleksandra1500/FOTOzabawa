@@ -9,7 +9,8 @@ interface RestApi {
 
     @Multipart
     @POST("upload")
-    fun upload(@Part imageFile: MultipartBody.Part): Call<ResponseBody>
+    fun upload(@Part imageFile: MultipartBody.Part,
+               @Part("rotation") rotation: Boolean): Call<ResponseBody>
 
     @GET("print")
     fun print(@Query("theme") theme: Int): Call<PrintResponse>
