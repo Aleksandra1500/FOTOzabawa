@@ -57,7 +57,7 @@ class RestApiService {
                     newFragment.url = response.body()?.url.toString()
                     newFragment.show(supportFragmentManager, "pdf")
 
-                    sounds.done()
+                    sounds.message()
                 }
             }
         )

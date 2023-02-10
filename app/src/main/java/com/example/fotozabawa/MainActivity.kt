@@ -317,6 +317,7 @@ class MainActivity : AppCompatActivity() {
                     timeCount = secondsNumber + 1
                 }
                 else if(timeCount == -1) {
+                    sounds.done()
                     makePdf()
                     this.cancel()
                 }
